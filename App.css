@@ -1,0 +1,37 @@
+#selectedTeam {
+  background-color:green;
+  
+}
+
+.team {
+  width : 17.5%;
+  margin:10px;
+  border-radius: 30px;
+}
+
+.confirmButtonDiv {
+  text-align: center;
+}
+
+#confirmButton {
+  font-size: 40px;
+}
+
+.grid-container {
+  text-align: center;
+}
+
+.existingUser, .newUser {
+  width:50%;
+  height: 25vh;
+  float:left;
+  text-align: center;
+  border-bottom: 2px solid black;
+  
+}
+
+.teamPic {
+  height: 6vh;
+}
+
+
