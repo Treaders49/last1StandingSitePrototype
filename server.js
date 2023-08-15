@@ -55,6 +55,27 @@ app.get("/api/fixtures", async (req, res) => {
 
 });
 
+app.get("/api/allFixtures", async (req, res) => {
+    
+
+  const client = new MongoClient(dburl, {
+      serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+      }
+    });
+  await client.connect();
+
+  const db = client.db("footballData");//select db
+  
+  const fixtures =  await db.collection("fixtures").find({}).toArray();
+   
+  await client.close();
+  res.json(fixtures)
+
+});
+
 app.post("/api/createUser", async (req, res) => {
     const {username, fullname, shop} = req.body;
     
@@ -73,6 +94,24 @@ app.post("/api/createUser", async (req, res) => {
     await db.collection("users").insertOne({"username": username, "name": fullname, "shop": shop, teamsSelected: [] });
     await client.close();
 });
+
+app.get("/api/getAllUserData", async(req, res) => {
+  const client = new MongoClient(dburl, {
+        serverApi: {
+          version: ServerApiVersion.v1,
+          strict: true,
+          deprecationErrors: true,
+        }
+      });
+    await client.connect();
+
+    const db = client.db("footballData");//select db
+
+    const userData =  await db.collection("users").find({}).toArray();
+    
+    await client.close();
+    res.json(userData);
+})
 
 app.get("/api/:user", async (req, res) => {
   const {user } = req.params;
@@ -95,9 +134,10 @@ app.get("/api/:user", async (req, res) => {
 });
 
 app.post("/api/chooseTeam/:selectedTeam", async (req, res) => {
-    const {user, previouslySelected} = req.body;
-    const {team} = req.params;
-    console.log(user, previouslySelected);
+    console.log(req.body);
+    const {name, previouslySelected} = req.body;
+    const {selectedTeam} = req.params;
+    console.log(name, previouslySelected, selectedTeam)
     const client = new MongoClient(dburl, {
       serverApi: {
         version: ServerApiVersion.v1,
@@ -109,10 +149,12 @@ app.post("/api/chooseTeam/:selectedTeam", async (req, res) => {
 
   const db = client.db("footballData");//select db
   if (previouslySelected != "") {
-    await db.collection("users").update({username:user}, {$pop :{teamsSelected: 1}});
-    await client.close();
-  }
-  
+    await db.collection("users").updateOne({username:name}, {$pop :{teamsSelected: 1}});
+    
+  } 
+
+  await db.collection("users").updateOne({username:name}, {$push :{teamsSelected: selectedTeam}})
+  await client.close();
 });
 
 
